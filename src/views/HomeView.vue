@@ -36,10 +36,10 @@ export default {
         { format: 'Лояльные ответы', value: 15, cycle: 2 },
         { format: 'Нейтральные ответы', value: 27, cycle: 2 },
         { format: 'Положительные ответы', value: 248, cycle: 2 },
-        { format: 'Отрицательные ответы', value: 4, cycle: 30 },
-        { format: 'Нейтральные ответы', value: 12, cycle: 30 },
-        { format: 'Лояльные ответы', value: 35, cycle: 30 },
-        { format: 'Положительные ответы', value: 316, cycle: 30 }
+        { format: 'Отрицательные ответы', value: 4, cycle: 3 },
+        { format: 'Нейтральные ответы', value: 12, cycle: 3 },
+        { format: 'Лояльные ответы', value: 35, cycle: 3 },
+        { format: 'Положительные ответы', value: 316, cycle: 3 }
       ]
       // items: [
       //   { date: 2000, industry: 'Wholesale and Retail Trade', unemployed: 1000 },

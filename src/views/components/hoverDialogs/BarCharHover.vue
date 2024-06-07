@@ -26,8 +26,8 @@ export default {
 .box::before {
   position: absolute;
   content: '';
-  top: 93%;
-  left: 45%;
+  top: 85%;
+  left: 50%;
   transform: rotate(45deg);
   background-color: #282828;
 

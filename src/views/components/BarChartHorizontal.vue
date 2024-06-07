@@ -11,7 +11,7 @@
             :height="rect.height"
             :opacity="isFocused && rect.y !== focusedElem.y ? 0.4 : 1"
             @mouseover="() => onMouseover(rect)"
-            @mouseleave="() => onMouseleave(rect)"
+            @mouseleave="onMouseleave"
           />
 
           <text :x="rect.textX" :y="rect.textY" dy="0.35em" dx="5">{{ rect.text }}</text>
@@ -22,12 +22,9 @@
         <g fill="none" v-axis:y="{ y, elementHeight }" :transform="`translate(${marginLeft}, 0)`"></g>
       </svg>
 
-      <BarCharHover v-if="isFocused && focusedElem" :style="`transform: translate(0px, ${focusedElem.tooltipYPos})`">
-        <div>
-          <div>{{ focusedElem }}</div>
-          <div>elementHeight:{{ elementHeight }}</div>
-          <!-- <div>x: {{ position.x }}</div>
-        <div>y: {{ position.y }}</div> -->
+      <BarCharHover v-if="isFocused && focusedElem" :style="`transform: translate(${focusedElem.tooltipXPos}, ${focusedElem.tooltipYPos})`">
+        <div :style="{ maxWidth: `${focusedElem.width}px` }">
+          <div>{{ focusedElem.raw }}</div>
         </div>
       </BarCharHover>
     </div>
@@ -65,7 +62,6 @@ export default {
 
   data() {
     return {
-      // barHeight: 50,
       marginTop: 30,
       marginRight: 20,
       marginBottom: 20,
@@ -82,7 +78,7 @@ export default {
       this.isFocused = true
     },
 
-    onMouseleave(item) {
+    onMouseleave() {
       this.isFocused = false
       this.focusedElem = undefined
     }
@@ -121,11 +117,6 @@ export default {
         .scaleLinear()
         .domain([0, d3.max(this.items, (d) => d.value)])
         .range([this.marginLeft, this.width - this.marginRight])
-
-      // return d3
-      //   .scaleUtc()
-      //   .domain(d3.extent(this.items, (d) => d.cycle))
-      //   .range([this.marginLeft, this.width - this.marginRight])
     },
 
     y() {
@@ -134,129 +125,33 @@ export default {
         .domain(d3.sort(this.items, (d) => d.value).map((d) => d.key))
         .rangeRound([this.marginTop, this.elementHeight - this.marginBottom])
         .padding(0.1)
-
-      // return d3.scaleLinear().rangeRound([this.height - this.marginBottom, this.marginTop])
     },
 
-    // svg
-    //   .append('g')
-    //   .attr('fill', 'steelblue')
-    //   .selectAll()
-    //   .data(alphabet)
-    //   .join('rect')
-    //   .attr('x', x(0))
-    //   .attr('y', (d) => y(d.key))
-    //   .attr('width', (d) => x(d.value) - x(0))
-    //   .attr('height', y.bandwidth())
     rects() {
       let result = []
 
       this.items.forEach((d) => {
+        const width = this.x(d.value) - this.x(0)
+        const y = this.y(d.key)
+
         result.push({
           raw: d,
           x: this.x(0),
-          y: this.y(d.key),
-          width: this.x(d.value) - this.x(0),
+          y: y,
+          width: width,
           height: this.y.bandwidth(),
 
           textX: this.x(d.value),
-          textY: this.y(d.key) + this.y.bandwidth() / 2,
+          textY: y + this.y.bandwidth() / 2,
           text: d.value,
 
-          tooltipYPos: `-${this.elementHeight - this.y(d.key) + 10}px`
-
-          //  .attr('x', (d) => x(d.value))
-          // .attr('y', (d) => y(d.key) + y.bandwidth() / 2)
-          // .attr('dy', '0.35em')
-          // .attr('dx', -4)
-          // .text((d) => format(d.value))
+          tooltipYPos: `-${this.elementHeight - y + 10}px`,
+          tooltipXPos: `${width / 2}px`
         })
       })
 
-      console.log('result', result)
       return result
     }
-  },
-
-  mounted() {
-    // Specify the chart’s dimensions, based on a bar’s height.
-    const barHeight = 50
-    const marginTop = 30
-    const marginRight = 0
-    const marginBottom = 10
-    const marginLeft = 30
-    const width = 928
-    const alphabet = this.items
-    const height = Math.ceil((this.items.length + 0.1) * barHeight) + marginTop + marginBottom
-
-    // Create the scales.
-    const x = d3
-      .scaleLinear()
-      .domain([0, d3.max(this.items, (d) => d.value)])
-      .range([marginLeft, width - marginRight])
-
-    const y = d3
-      .scaleBand()
-      .domain(d3.sort(this.items, (d) => d.value).map((d) => d.key))
-      .rangeRound([marginTop, height - marginBottom])
-      .padding(0.1)
-
-    // Create a value format.
-    const format = x.tickFormat(20, '%')
-
-    // Create the SVG container.
-    const svg = d3
-      .create('svg')
-      .attr('width', width)
-      .attr('height', height)
-      .attr('viewBox', [0, 0, width, height])
-      .attr('style', 'max-width: 100%; height: auto; font: 10px sans-serif;')
-
-    // Append a rect for each key.
-    svg
-      .append('g')
-      .attr('fill', 'steelblue')
-      .selectAll()
-      .data(alphabet)
-      .join('rect')
-      .attr('x', x(0))
-      .attr('y', (d) => y(d.key))
-      .attr('width', (d) => x(d.value) - x(0))
-      .attr('height', y.bandwidth())
-
-    // Append a label for each key.
-    svg
-      .append('g')
-      .attr('fill', 'white')
-      .attr('text-anchor', 'end')
-      .selectAll()
-      .data(alphabet)
-      .join('text')
-      .attr('x', (d) => x(d.value))
-      .attr('y', (d) => y(d.key) + y.bandwidth() / 2)
-      .attr('dy', '0.35em')
-      .attr('dx', -4)
-      .text((d) => format(d.value))
-      .call((text) =>
-        text
-          .filter((d) => x(d.value) - x(0) < 20) // short bars
-          .attr('dx', +4)
-          .attr('fill', 'black')
-          .attr('text-anchor', 'start')
-      )
-
-    // Create the axes.
-    svg
-      .append('g')
-      .attr('transform', `translate(0,${marginTop})`)
-      .call(d3.axisTop(x).ticks(width / 80, '%'))
-      .call((g) => g.select('.domain').remove())
-
-    svg.append('g').attr('transform', `translate(${marginLeft},0)`).call(d3.axisLeft(y).tickSizeOuter(0))
-
-    // svg.node();
-    console.log('svg.node()', svg.node())
-    this.$refs.test.append(svg.node())
   }
 }
 </script>
