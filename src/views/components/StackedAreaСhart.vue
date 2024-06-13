@@ -2,7 +2,7 @@
   <div style="width: 100%">
     <svg :width="width" :height="height" :viewBox="viewBox">
       <g>
-        <path v-for="item in areas" :fill="item.fill" :d="item.d"></path>
+        <path v-for="item in areas" :fill="item.fill" :d="item.d" :key="item.fill"></path>
       </g>
 
       <g fill="none" v-axis:x="{ x, height }" :transform="`translate(0, ${height - marginBottom})`"></g>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>
+    <div style="position: relative">
       <svg :width="width" :height="elementHeight" :viewBox="viewBox">
         <g v-for="(rect, idx) in rects" :key="`rect_${idx}`">
           <rect
@@ -10,7 +10,7 @@
             :width="rect.width"
             :height="rect.height"
             :opacity="isFocused && rect.y !== focusedElem.y ? 0.4 : 1"
-            @mouseover="() => onMouseover(rect)"
+            @mouseover="(event) => onMouseover(event, rect)"
             @mouseleave="onMouseleave"
           />
 
@@ -22,7 +22,7 @@
         <g fill="none" v-axis:y="{ y, elementHeight }" :transform="`translate(${marginLeft}, 0)`"></g>
       </svg>
 
-      <BarCharHover v-if="isFocused && focusedElem" :style="`transform: translate(${focusedElem.tooltipXPos}, ${focusedElem.tooltipYPos})`">
+      <BarCharHover v-if="isFocused && focusedElem" :style="`top: ${focusedElem.tooltipYPos}; left: ${focusedElem.tooltipXPos};`">
         <div :style="{ maxWidth: `${focusedElem.width}px` }">
           <div>{{ focusedElem.raw }}</div>
         </div>
@@ -73,14 +73,14 @@ export default {
   },
 
   methods: {
-    onMouseover(item) {
+    onMouseover(event, item) {
       this.focusedElem = item
       this.isFocused = true
     },
 
     onMouseleave() {
-      this.isFocused = false
-      this.focusedElem = undefined
+      // this.isFocused = false
+      // this.focusedElem = undefined
     }
   },
 
@@ -132,21 +132,23 @@ export default {
 
       this.items.forEach((d) => {
         const width = this.x(d.value) - this.x(0)
+        const height = this.y.bandwidth()
         const y = this.y(d.key)
+        const x = this.x(0)
 
         result.push({
           raw: d,
-          x: this.x(0),
+          x: x,
           y: y,
           width: width,
-          height: this.y.bandwidth(),
+          height: height,
 
           textX: this.x(d.value),
-          textY: y + this.y.bandwidth() / 2,
+          textY: y + height / 2,
           text: d.value,
 
-          tooltipYPos: `-${this.elementHeight - y + 10}px`,
-          tooltipXPos: `${width / 2}px`
+          tooltipYPos: `${y + height + 5}px`,
+          tooltipXPos: `${x}px`
         })
       })
 

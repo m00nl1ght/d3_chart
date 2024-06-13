@@ -1,15 +1,20 @@
 <template>
   <div>
     <h1>This is an HOME page</h1>
+
+    <LineDotChart />
     <StackedAreaСhart :items="items" />
   </div>
 </template>
 
 <script>
 import StackedAreaСhart from './components/StackedAreaСhart.vue'
+import LineDotChart from './components/LineDotChart.vue'
+
 export default {
   components: {
-    StackedAreaСhart
+    StackedAreaСhart,
+    LineDotChart
   },
 
   data() {
