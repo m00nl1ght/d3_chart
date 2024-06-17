@@ -1,6 +1,9 @@
 <template>
   <div style="width: 100%">
-    <svg ref="test" :width="width" :height="height" :viewBox="viewBox"></svg>
+    <svg ref="test" :width="width" :height="height" :viewBox="viewBox" class="chart">
+      <g fill="none" v-axis:x="{ x: xScale, height }" :transform="`translate(0, ${height - marginBottom})`"></g>
+      <g fill="none" v-axis:y="{ y: yScale, height }" :transform="`translate(${marginLeft}, 0)`"></g>
+    </svg>
     <div></div>
   </div>
 </template>
@@ -15,7 +18,7 @@ export default {
       type: Number
     },
     height: {
-      default: 350,
+      default: 550,
       type: Number
     }
   },
@@ -67,8 +70,10 @@ export default {
         { year: 2022, media: 'Directories', spending: 0.74 }
       ],
 
-      leftMargin: 70,
-      topMargin: 30
+      marginLeft: 70,
+      marginTop: 30,
+      marginBottom: 20,
+      marginRight: 20
     }
   },
 
@@ -96,14 +101,14 @@ export default {
       return d3
         .scaleTime()
         .domain(d3.extent(this.parsedItems, (d) => d.year))
-        .range([this.leftMargin, 900])
+        .range([this.marginLeft, this.width - this.marginRight])
     },
 
     yScale() {
       return d3
         .scaleLinear()
-        .domain([0, d3.max(this.parsedItems, (d) => d.spending) + this.topMargin])
-        .range([this.height - 50, 0])
+        .domain([0, d3.max(this.parsedItems, (d) => d.spending) + this.marginTop])
+        .range([this.height - this.marginBottom, this.marginTop])
     },
 
     series() {
@@ -133,6 +138,25 @@ export default {
     }
   },
 
+  directives: {
+    axis(el, binding) {
+      const axis = binding.arg
+      const axisMethod = { x: 'axisBottom', y: 'axisLeft' }[axis]
+      const methodArg = binding.value[axis]
+      const height = binding.value['height']
+      console.log('axis', axis)
+      console.log('axisMethod', axisMethod)
+      console.log('methodArg', methodArg)
+
+      if (axisMethod === 'axisBottom') {
+        d3.select(el).call(d3.axisBottom(methodArg))
+      } else {
+        d3.select(el).call(d3.axisLeft(methodArg))
+        // .call((g) => g.select('.domain').remove())
+      }
+    }
+  },
+
   methods: {
     createLinePath(d) {
       let res = d3
@@ -146,31 +170,31 @@ export default {
   },
 
   mounted() {
-    let xAxis = d3.axisBottom().scale(this.xScale)
+    // let xAxis = d3.axisBottom().scale(this.xScale)
 
-    d3.select(this.$refs.test)
-      .append('g')
-      .attr('class', 'axis')
-      .attr('transform', 'translate(0,320)')
-      .call(xAxis)
-      .append('text')
-      .attr('x', (900 + 70) / 2) //middle of the xAxis
-      .attr('y', '50') // a little bit below xAxis
-      .text('Year')
+    // d3.select(this.$refs.test)
+    //   .append('g')
+    //   .attr('class', 'axis')
+    //   .attr('transform', 'translate(0,320)')
+    //   .call(xAxis)
+    //   .append('text')
+    //   .attr('x', (900 + 70) / 2) //middle of the xAxis
+    //   .attr('y', '50') // a little bit below xAxis
+    //   .text('Year')
 
-    let yAxis = d3.axisLeft().scale(this.yScale).ticks(10)
+    // let yAxis = d3.axisLeft().scale(this.yScale).ticks(10)
 
-    d3.select(this.$refs.test)
-      .append('g')
-      .attr('class', 'axis')
-      .attr('transform', `translate(${this.leftMargin},20)`) //use variable in translate
-      .call(yAxis)
-      .append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('x', '-150')
-      .attr('y', '-50')
-      .attr('text-anchor', 'end')
-      .text('US Media Ad Spending (Billions)')
+    // d3.select(this.$refs.test)
+    //   .append('g')
+    //   .attr('class', 'axis')
+    //   .attr('transform', `translate(${this.marginLeft},20)`) //use variable in translate
+    //   .call(yAxis)
+    //   .append('text')
+    //   .attr('transform', 'rotate(-90)')
+    //   .attr('x', '-150')
+    //   .attr('y', '-50')
+    //   .attr('text-anchor', 'end')
+    //   .text('US Media Ad Spending (Billions)')
 
     d3.select(this.$refs.test)
       .selectAll('.line')
@@ -192,9 +216,10 @@ export default {
       .enter()
       .append('circle')
       .attr('r', 6)
+      .attr('class', 'dot')
       .attr('cx', (d) => this.xScale(d.year))
       .attr('cy', (d) => this.yScale(d.spending))
-      .style('fill', (d) => this.colors[2])
+      .style('color', (d) => this.colors[2])
   }
 }
 </script>
@@ -220,5 +245,13 @@ export default {
 .legend text {
   fill: black;
   font-family: 'Arial Black', Gadget, sans-serif;
+}
+
+.chart::v-deep .dot {
+  cursor: pointer;
+  r: 3.5px !important;
+  stroke-width: 3px;
+  stroke: currentColor;
+  fill: white;
 }
 </style>

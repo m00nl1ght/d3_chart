@@ -3,7 +3,7 @@
     <h1>This is an HOME page</h1>
 
     <LineDotChart />
-    <StackedAreaСhart :items="items" />
+    <!-- <StackedAreaСhart :items="items" /> -->
   </div>
 </template>
 

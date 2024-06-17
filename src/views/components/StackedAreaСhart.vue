@@ -1,8 +1,23 @@
 <template>
-  <div style="width: 100%">
+  <div>
+    <ul class="legend">
+      <li class="legend__box" v-for="(arc, idx) in areas" :key="`inf_${idx}`" @mouseover="() => onMouseover(arc)" @mouseleave="onMouseleave">
+        <div class="legend__dot" :style="{ 'background-color': colors(arc.title) }"></div>
+        {{ arc.title }}
+      </li>
+    </ul>
+
     <svg :width="width" :height="height" :viewBox="viewBox">
       <g>
-        <path v-for="item in areas" :fill="item.fill" :d="item.d" :key="item.fill"></path>
+        <path
+          v-for="item in areas"
+          :fill="item.fill"
+          :d="item.d"
+          :key="item.fill"
+          :opacity="isFocused && item.title !== focusedElem.title ? 0.4 : 1"
+          @mouseover="() => onMouseover(item)"
+          @mouseleave="onMouseleave"
+        ></path>
       </g>
 
       <g fill="none" v-axis:x="{ x, height }" :transform="`translate(0, ${height - marginBottom})`"></g>
@@ -37,7 +52,10 @@ export default {
       marginTop: 20,
       marginRight: 20,
       marginBottom: 20,
-      marginLeft: 40
+      marginLeft: 40,
+
+      isFocused: false,
+      focusedElem: undefined
     }
   },
 
@@ -95,7 +113,8 @@ export default {
       this.series.forEach((elem) => {
         result.push({
           d: this.area(elem),
-          fill: this.colors(elem.key)
+          fill: this.colors(elem.key),
+          title: elem.key
         })
       })
 
@@ -120,18 +139,38 @@ export default {
           .call((g) => g.select('.domain').remove())
       }
     }
+  },
+
+  methods: {
+    onMouseover(item) {
+      this.focusedElem = item
+      this.isFocused = true
+    },
+
+    onMouseleave() {
+      this.isFocused = false
+      this.focusedElem = undefined
+    }
   }
-
-  // methods: {
-  //   createAxis() {
-  //     const x = this.$refs.x
-  //     console.log('where', x);
-  //     d3.axisBottom(this.x).tickSizeOuter(0)(x)
-  //     // svg
-  //     // .append('g')
-  //     // .attr('transform', `translate(0,${height - marginBottom})`)
-
-  //   }
-  // },
 }
 </script>
+
+<style scoped>
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.legend__box {
+  display: flex;
+  align-items: center;
+  margin-right: 12px;
+}
+
+.legend__dot {
+  height: 12px;
+  width: 12px;
+  border-radius: 6px;
+  margin-right: 12px;
+}
+</style>
