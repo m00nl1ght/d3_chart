@@ -1,42 +1,54 @@
 <template>
   <div>
-    <ul class="legend">
-      <li class="legend__box" v-for="(arc, idx) in areas" :key="`inf_${idx}`" @mouseover="() => onMouseover(arc)" @mouseleave="onMouseleave">
-        <div class="legend__dot" :style="{ 'background-color': colors(arc.title) }"></div>
-        {{ arc.title }}
-      </li>
-    </ul>
-
-    <svg :width="width" :height="height" :viewBox="viewBox">
-      <g>
-        <path
-          v-for="item in areas"
-          :fill="item.fill"
-          :d="item.d"
-          :key="item.fill"
-          :opacity="isFocused && item.title !== focusedElem.title ? 0.4 : 1"
-          @mouseover="() => onMouseover(item)"
-          @mouseleave="onMouseleave"
-        ></path>
+    <svg v-if="series && series.length > 0" :width="width" :height="height" :viewBox="viewBox" class="chart">
+      <g v-for="item in series" :key="`key_${colors(item.key)}`" :fill="colors(item.key)">
+        <rect
+          v-for="(r, idx) in item"
+          :key="idx"
+          :x="xScale(r.data[0])"
+          :y="yScale(r[1])"
+          :height="yScale(r[0]) - yScale(r[1])"
+          :width="xScale.bandwidth()"
+          :area-data="r.data[0]"
+        ></rect>
       </g>
 
-      <g fill="none" v-axis:x="{ x, height }" :transform="`translate(0, ${height - marginBottom})`"></g>
-      <g fill="none" v-axis:y="{ y, height }" :transform="`translate(${marginLeft}, 0)`"></g>
+      <g v-axis:x="{ x: xScale }" fill="none" :transform="`translate(0, ${height - marginBottom})`"></g>
+      <g v-axis:y="{ y: yScale }" fill="none" :transform="`translate(${marginLeft}, 0)`"></g>
     </svg>
 
-    <div ref="test"></div>
+    <div id="chart"></div>
   </div>
 </template>
 
 <script>
+/* eslint-disable */
 import * as d3 from 'd3'
 
 export default {
+  directives: {
+    axis(el, binding) {
+      const axis = binding.arg
+      const axisMethod = { x: 'axisBottom', y: 'axisLeft' }[axis]
+      const methodArg = binding.value[axis]
+
+      if (axisMethod === 'axisBottom') {
+        d3.select(el)
+          .call(d3.axisBottom(methodArg).tickSizeOuter(0))
+          .call((g) => g.selectAll('.domain').remove())
+      } else {
+        d3.select(el)
+          .call(d3.axisLeft(methodArg).ticks(null, 's'))
+          .call((g) => g.selectAll('.domain').remove())
+      }
+    }
+  },
+
   props: {
-    items: {
-      type: Array,
-      default: () => []
-    },
+    // items: {
+    //   type: Array,
+    //   default: () => [],
+    // },
     width: {
       default: 500,
       type: Number
@@ -49,128 +61,613 @@ export default {
 
   data() {
     return {
-      marginTop: 20,
-      marginRight: 20,
+      marginTop: 10,
+      marginRight: 10,
       marginBottom: 20,
       marginLeft: 40,
 
-      isFocused: false,
-      focusedElem: undefined
+      items: [
+        {
+          count: 1,
+          lastdate: '2023-07-24',
+          text_value: '0'
+        },
+        {
+          count: 1,
+          lastdate: '2023-07-24',
+          text_value: '1'
+        },
+        {
+          count: 2,
+          lastdate: '2023-07-24',
+          text_value: '2'
+        },
+        {
+          count: 7,
+          lastdate: '2023-07-24',
+          text_value: '3'
+        },
+        {
+          count: 12,
+          lastdate: '2023-07-24',
+          text_value: '4'
+        },
+        {
+          count: 6,
+          lastdate: '2023-07-24',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-07-26',
+          text_value: '1'
+        },
+        {
+          count: 2,
+          lastdate: '2023-07-26',
+          text_value: '2'
+        },
+        {
+          count: 10,
+          lastdate: '2023-07-26',
+          text_value: '3'
+        },
+        {
+          count: 9,
+          lastdate: '2023-07-26',
+          text_value: '4'
+        },
+        {
+          count: 5,
+          lastdate: '2023-07-26',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-07-27',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-07-31',
+          text_value: '1'
+        },
+        {
+          count: 2,
+          lastdate: '2023-07-31',
+          text_value: '2'
+        },
+        {
+          count: 8,
+          lastdate: '2023-07-31',
+          text_value: '3'
+        },
+        {
+          count: 11,
+          lastdate: '2023-07-31',
+          text_value: '4'
+        },
+        {
+          count: 5,
+          lastdate: '2023-07-31',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-02',
+          text_value: '4'
+        },
+        {
+          count: 3,
+          lastdate: '2023-08-04',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-09',
+          text_value: '1'
+        },
+        {
+          count: 3,
+          lastdate: '2023-08-09',
+          text_value: '2'
+        },
+        {
+          count: 5,
+          lastdate: '2023-08-09',
+          text_value: '3'
+        },
+        {
+          count: 11,
+          lastdate: '2023-08-09',
+          text_value: '4'
+        },
+        {
+          count: 3,
+          lastdate: '2023-08-09',
+          text_value: '5'
+        },
+        {
+          count: 3,
+          lastdate: '2023-08-10',
+          text_value: '4'
+        },
+        {
+          count: 7,
+          lastdate: '2023-08-14',
+          text_value: '3'
+        },
+        {
+          count: 12,
+          lastdate: '2023-08-14',
+          text_value: '4'
+        },
+        {
+          count: 7,
+          lastdate: '2023-08-14',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-15',
+          text_value: '4'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-15',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-16',
+          text_value: '2'
+        },
+        {
+          count: 6,
+          lastdate: '2023-08-16',
+          text_value: '3'
+        },
+        {
+          count: 10,
+          lastdate: '2023-08-16',
+          text_value: '4'
+        },
+        {
+          count: 5,
+          lastdate: '2023-08-16',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-17',
+          text_value: '4'
+        },
+        {
+          count: 2,
+          lastdate: '2023-08-17',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-21',
+          text_value: '0'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-21',
+          text_value: '1'
+        },
+        {
+          count: 2,
+          lastdate: '2023-08-21',
+          text_value: '2'
+        },
+        {
+          count: 6,
+          lastdate: '2023-08-21',
+          text_value: '3'
+        },
+        {
+          count: 11,
+          lastdate: '2023-08-21',
+          text_value: '4'
+        },
+        {
+          count: 11,
+          lastdate: '2023-08-21',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-22',
+          text_value: '3'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-23',
+          text_value: '0'
+        },
+        {
+          count: 2,
+          lastdate: '2023-08-23',
+          text_value: '2'
+        },
+        {
+          count: 6,
+          lastdate: '2023-08-23',
+          text_value: '3'
+        },
+        {
+          count: 8,
+          lastdate: '2023-08-23',
+          text_value: '4'
+        },
+        {
+          count: 8,
+          lastdate: '2023-08-23',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-25',
+          text_value: '5'
+        },
+        {
+          count: 2,
+          lastdate: '2023-08-28',
+          text_value: '0'
+        },
+        {
+          count: 2,
+          lastdate: '2023-08-28',
+          text_value: '1'
+        },
+        {
+          count: 1,
+          lastdate: '2023-08-28',
+          text_value: '2'
+        },
+        {
+          count: 6,
+          lastdate: '2023-08-28',
+          text_value: '3'
+        },
+        {
+          count: 11,
+          lastdate: '2023-08-28',
+          text_value: '4'
+        },
+        {
+          count: 5,
+          lastdate: '2023-08-28',
+          text_value: '5'
+        },
+        {
+          count: 4,
+          lastdate: '2023-08-30',
+          text_value: '4'
+        },
+        {
+          count: 6,
+          lastdate: '2023-08-31',
+          text_value: '3'
+        },
+        {
+          count: 2,
+          lastdate: '2023-09-01',
+          text_value: '3'
+        },
+        {
+          count: 1,
+          lastdate: '2023-09-04',
+          text_value: '4'
+        },
+        {
+          count: 1,
+          lastdate: '2023-11-20',
+          text_value: '1'
+        },
+        {
+          count: 5,
+          lastdate: '2023-11-20',
+          text_value: '3'
+        },
+        {
+          count: 10,
+          lastdate: '2023-11-20',
+          text_value: '4'
+        },
+        {
+          count: 8,
+          lastdate: '2023-11-20',
+          text_value: '5'
+        },
+        {
+          count: 2,
+          lastdate: '2023-11-21',
+          text_value: '3'
+        },
+        {
+          count: 1,
+          lastdate: '2023-11-21',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-11-22',
+          text_value: '0'
+        },
+        {
+          count: 1,
+          lastdate: '2023-11-22',
+          text_value: '1'
+        },
+        {
+          count: 1,
+          lastdate: '2023-11-22',
+          text_value: '2'
+        },
+        {
+          count: 7,
+          lastdate: '2023-11-22',
+          text_value: '3'
+        },
+        {
+          count: 8,
+          lastdate: '2023-11-22',
+          text_value: '4'
+        },
+        {
+          count: 5,
+          lastdate: '2023-11-22',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-11-23',
+          text_value: '3'
+        },
+        {
+          count: 3,
+          lastdate: '2023-11-24',
+          text_value: '2'
+        },
+        {
+          count: 4,
+          lastdate: '2023-11-24',
+          text_value: '3'
+        },
+        {
+          count: 10,
+          lastdate: '2023-11-24',
+          text_value: '4'
+        },
+        {
+          count: 8,
+          lastdate: '2023-11-24',
+          text_value: '5'
+        },
+        {
+          count: 2,
+          lastdate: '2023-11-27',
+          text_value: '3'
+        },
+        {
+          count: 1,
+          lastdate: '2023-11-27',
+          text_value: '4'
+        },
+        {
+          count: 3,
+          lastdate: '2023-12-01',
+          text_value: '3'
+        },
+        {
+          count: 8,
+          lastdate: '2023-12-01',
+          text_value: '4'
+        },
+        {
+          count: 10,
+          lastdate: '2023-12-01',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-12-03',
+          text_value: '3'
+        },
+        {
+          count: 3,
+          lastdate: '2023-12-04',
+          text_value: '2'
+        },
+        {
+          count: 9,
+          lastdate: '2023-12-04',
+          text_value: '3'
+        },
+        {
+          count: 10,
+          lastdate: '2023-12-04',
+          text_value: '4'
+        },
+        {
+          count: 4,
+          lastdate: '2023-12-04',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-12-05',
+          text_value: '5'
+        },
+        {
+          count: 3,
+          lastdate: '2023-12-06',
+          text_value: '2'
+        },
+        {
+          count: 4,
+          lastdate: '2023-12-06',
+          text_value: '3'
+        },
+        {
+          count: 8,
+          lastdate: '2023-12-06',
+          text_value: '4'
+        },
+        {
+          count: 6,
+          lastdate: '2023-12-06',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-12-07',
+          text_value: '4'
+        },
+        {
+          count: 1,
+          lastdate: '2023-12-08',
+          text_value: '0'
+        },
+        {
+          count: 5,
+          lastdate: '2023-12-08',
+          text_value: '3'
+        },
+        {
+          count: 10,
+          lastdate: '2023-12-08',
+          text_value: '4'
+        },
+        {
+          count: 6,
+          lastdate: '2023-12-08',
+          text_value: '5'
+        },
+        {
+          count: 3,
+          lastdate: '2023-12-11',
+          text_value: '2'
+        },
+        {
+          count: 7,
+          lastdate: '2023-12-11',
+          text_value: '3'
+        },
+        {
+          count: 8,
+          lastdate: '2023-12-11',
+          text_value: '4'
+        },
+        {
+          count: 4,
+          lastdate: '2023-12-11',
+          text_value: '5'
+        },
+        {
+          count: 7,
+          lastdate: '2023-12-12',
+          text_value: '4'
+        },
+        {
+          count: 2,
+          lastdate: '2023-12-13',
+          text_value: '2'
+        },
+        {
+          count: 11,
+          lastdate: '2023-12-13',
+          text_value: '3'
+        },
+        {
+          count: 13,
+          lastdate: '2023-12-13',
+          text_value: '4'
+        },
+        {
+          count: 5,
+          lastdate: '2023-12-13',
+          text_value: '5'
+        },
+        {
+          count: 1,
+          lastdate: '2023-12-14',
+          text_value: '2'
+        },
+        {
+          count: 1,
+          lastdate: '2023-12-14',
+          text_value: '3'
+        },
+        {
+          count: 1,
+          lastdate: '2023-12-14',
+          text_value: '4'
+        },
+        {
+          count: 2,
+          lastdate: '2023-12-15',
+          text_value: '4'
+        }
+      ]
     }
   },
 
   computed: {
     viewBox() {
-      // return [-this.width / 2, -this.height / 2, this.width, this.height];
       return `0 0 ${this.width} ${this.height}`
     },
 
-    x() {
-      return d3
-        .scaleUtc()
-        .domain(d3.extent(this.items, (d) => d.cycle))
-        .range([this.marginLeft, this.width - this.marginRight])
-    },
-
-    y() {
-      return d3.scaleLinear().rangeRound([this.height - this.marginBottom, this.marginTop])
-    },
-
     series() {
-      // if(!this.items) return []
-      return d3
+      let series = d3
         .stack()
-        .offset(d3.stackOffsetExpand)
-        .keys(d3.union(this.items.map((d) => d.format))) // distinct series keys, in input order
-        .value(([, D], key) => D.get(key).value)(
-        // get value for each series key and stack
+        .keys(d3.union(this.items.map((d) => d.text_value))) // distinct series keys, in input order
+        .value(([, D], key) => {
+          return D.get(key) ? D.get(key)['count'] : 0
+        })(
         d3.index(
           this.items,
-          (d) => d.cycle,
-          (d) => d.format
+          (d) => d.lastdate,
+          (d) => d.text_value
         )
       ) // group by stack then series key
+
+      const res = series.map((D) => {
+        const resultArr = D.map((d) => {
+          return (d.key = D.key), d
+        })
+        resultArr.key = D.key
+        return resultArr
+      })
+
+      return res
+    },
+
+    xScale() {
+      return d3
+        .scaleBand()
+        .domain(this.items.map((d) => d.lastdate))
+        .range([this.marginLeft, this.width - this.marginRight])
+        .padding(0.1)
+    },
+
+    yScale() {
+      return d3
+        .scaleLinear()
+        .domain([0, d3.max(this.series, (d) => d3.max(d, (d) => d[1]))])
+        .range([this.height - this.marginBottom, this.marginTop])
     },
 
     colors() {
       return d3
         .scaleOrdinal()
         .domain(this.series.map((d) => d.key))
-        .range(d3.schemeTableau10)
-    },
-
-    area() {
-      return d3
-        .area()
-        .x((d) => this.x(d.data[0]))
-        .y0((d) => this.y(d[0]))
-        .y1((d) => this.y(d[1]))
-    },
-
-    areas() {
-      let result = []
-
-      this.series.forEach((elem) => {
-        result.push({
-          d: this.area(elem),
-          fill: this.colors(elem.key),
-          title: elem.key
-        })
-      })
-
-      return result
-    }
-  },
-
-  directives: {
-    axis(el, binding) {
-      const axis = binding.arg
-      const axisMethod = { x: 'axisBottom', y: 'axisLeft' }[axis]
-      const methodArg = binding.value[axis]
-      const height = binding.value['height']
-
-      if (axisMethod === 'axisBottom') {
-        d3.select(el)
-          .call(d3.axisBottom(methodArg).tickFormat((y) => (y * 1).toFixed()))
-          .call((g) => g.select('.domain').remove())
-      } else {
-        d3.select(el)
-          .call(d3.axisLeft(methodArg).ticks(height / 80, '%'))
-          .call((g) => g.select('.domain').remove())
-      }
-    }
-  },
-
-  methods: {
-    onMouseover(item) {
-      this.focusedElem = item
-      this.isFocused = true
-    },
-
-    onMouseleave() {
-      this.isFocused = false
-      this.focusedElem = undefined
+        .range(d3.schemeSpectral[this.series.length])
+        .unknown('#ccc')
     }
   }
 }
 </script>
-
-<style scoped>
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.legend__box {
-  display: flex;
-  align-items: center;
-  margin-right: 12px;
-}
-
-.legend__dot {
-  height: 12px;
-  width: 12px;
-  border-radius: 6px;
-  margin-right: 12px;
-}
-</style>
