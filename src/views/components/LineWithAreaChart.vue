@@ -1,9 +1,18 @@
 <template>
   <div>
+    <!-- <div id="line-chart"></div> -->
+
     <svg :width="width" :height="height" :viewBox="viewBox" class="chart">
+      <defs>
+        <linearGradient id="gradient" :x1="0" y1="100%" :x2="0" y2="0%">
+          <stop offset="0%" style="stop-color: #bbf6ca; stop-opacity: 0.05"></stop>
+          <stop offset="100%" style="stop-color: #bbf6ca; stop-opacity: 0.5"></stop>
+        </linearGradient>
+      </defs>
+
       <g fill="none">
-        <path :d="dLine" style="fill: url('#gradient')"></path>
-        <path :d="line(parsedData)" style="fill: none" filter="url('#glow')" stroke="#47D3DE" stroke-width="2"></path>
+        <path :d="areaPath" style="fill: url('#gradient')"></path>
+        <path :d="line(parsedData)" style="fill: none" stroke="#47D3DE" stroke-width="2"></path>
       </g>
 
       <circle
@@ -17,12 +26,18 @@
 
       <g v-axis:x="{ x: xScale, height }" fill="none" :transform="`translate(0, ${height - marginBottom})`"></g>
 
-      <g v-axis:y="{ y: yScale, height }" fill="none" :transform="`translate(${marginLeft}, 0)`" class="item-title"></g>
+      <g
+        v-axis:y="{ y: yScale, height, lineWidth: width - marginLeft - marginRight }"
+        fill="none"
+        :transform="`translate(${marginLeft}, 0)`"
+        class="item-title"
+      ></g>
     </svg>
   </div>
 </template>
 
 <script>
+/* eslint-disable */
 import * as d3 from 'd3'
 
 export default {
@@ -31,32 +46,33 @@ export default {
       const axis = binding.arg
       const axisMethod = { x: 'axisBottom', y: 'axisLeft' }[axis]
       const methodArg = binding.value[axis]
+      const lineWidth = binding.value['lineWidth']
 
       const formatTime = d3.utcFormat('%B %d, %Y')
       if (axisMethod === 'axisBottom') {
         d3.select(el)
-          .call(d3.axisBottom(methodArg).tickFormat((y) => formatTime(y)))
-          .call((g) => g.select('.domain').remove())
+          .call(
+            d3
+              .axisBottom(methodArg)
+              .tickFormat((y) => formatTime(y))
+              .ticks(5)
+          )
           .selectAll('text')
-          .style('text-anchor', 'end')
-          .attr('dx', '-.8em')
-          .attr('dy', '.15em')
-          .attr('transform', 'rotate(-65)')
       } else {
         d3.select(el)
           .call(d3.axisLeft(methodArg).ticks(5))
-          .call((g) => g.select('.domain').remove())
+          .call((g) => g.selectAll('.tick line').clone().attr('x2', lineWidth).attr('stroke-opacity', 0.1).attr('stroke-dasharray', 5, 5))
       }
     }
   },
 
   props: {
-    items: {
-      type: Array,
-      default: () => []
-    },
+    // items: {
+    //   type: Array,
+    //   default: () => []
+    // },
     width: {
-      default: 700,
+      default: 900,
       type: Number
     },
     height: {
@@ -70,7 +86,90 @@ export default {
       marginLeft: 50,
       marginTop: 30,
       marginBottom: 60,
-      marginRight: 20
+      marginRight: 20,
+
+      items: [
+        {
+          avg: 3.59,
+          lastdate: '2023-07-24'
+        },
+        {
+          avg: 3.56,
+          lastdate: '2023-07-26'
+        },
+        {
+          avg: 3.63,
+          lastdate: '2023-07-31'
+        },
+        {
+          avg: 3.52,
+          lastdate: '2023-08-09'
+        },
+        {
+          avg: 4,
+          lastdate: '2023-08-14'
+        },
+        {
+          avg: 3.86,
+          lastdate: '2023-08-16'
+        },
+        {
+          avg: 3.81,
+          lastdate: '2023-08-21'
+        },
+        {
+          avg: 3.76,
+          lastdate: '2023-08-23'
+        },
+        {
+          avg: 3.37,
+          lastdate: '2023-08-28'
+        },
+        {
+          avg: 3,
+          lastdate: '2023-08-31'
+        },
+        {
+          avg: 4,
+          lastdate: '2023-11-20'
+        },
+        {
+          avg: 3.52,
+          lastdate: '2023-11-22'
+        },
+        {
+          avg: 3.92,
+          lastdate: '2023-11-24'
+        },
+        {
+          avg: 4.33,
+          lastdate: '2023-12-01'
+        },
+        {
+          avg: 3.58,
+          lastdate: '2023-12-04'
+        },
+        {
+          avg: 3.81,
+          lastdate: '2023-12-06'
+        },
+        {
+          avg: 3.86,
+          lastdate: '2023-12-08'
+        },
+        {
+          avg: 3.59,
+          lastdate: '2023-12-11'
+        },
+        {
+          avg: 4,
+          lastdate: '2023-12-12'
+        },
+        {
+          avg: 3.68,
+          lastdate: '2023-12-13'
+        }
+      ]
     }
   },
 
@@ -90,36 +189,23 @@ export default {
     },
 
     xScale() {
-      return (
-        d3
-          .scaleTime()
-          // .domain([d3.min(this.parsedData, (v) => v.xVal), d3.max(this.parsedData, (v) => v.xVal)])
-          .domain(d3.extent(this.parsedData, (v) => v.xVal))
-          // .range([0, this.width])
-          .range([this.marginLeft, this.width - this.marginRight])
-      )
+      return d3
+        .scaleTime()
+        .domain(d3.extent(this.parsedData, (v) => v.xVal))
+        .range([this.marginLeft, this.width - this.marginRight])
     },
 
     yScale() {
-      return (
-        d3
-          .scaleLinear()
-          .domain([
-            0, 5
-            // d3.min(this.parsedData, (v) => v.yVal),
-            // d3.max(this.parsedData, (v) => v.yVal),
-          ])
-          // .range([this.height, 0]);
-          .range([this.height - this.marginBottom, this.marginTop])
-      )
+      return d3
+        .scaleLinear()
+        .domain([0, 5])
+        .range([this.height - this.marginBottom, this.marginTop])
     },
 
     line() {
       return d3
         .line()
         .x((d) => {
-          // console.log('lineX', d.xVal);
-          // console.log('lineXScale', this.xScale(d.xVal));
           return this.xScale(d.xVal)
         })
         .y((d) => this.yScale(d.yVal))
@@ -128,20 +214,23 @@ export default {
 
     dLine() {
       if (!this.line(this.parsedData)) return ''
+
       const lineValues = this.line(this.parsedData).slice(1)
-      // console.log('lineValues', lineValues);
-      // if (!lineValues) return '';
-
       const splitedValues = lineValues.split(',')
-
-      return ''
-      // return `M0,${this.height},${lineValues},l0,${
-      //   this.height - splitedValues[splitedValues.length - 1]
-      // }`;
+      return `M0,${this.height},${lineValues},l0,${this.height - splitedValues[splitedValues.length - 1]}`
     },
 
-    ticks() {
-      return d3.axisBottom(this.xScale).ticks(12)
+    area() {
+      return d3
+        .area()
+        .x((d) => this.xScale(d.xVal))
+        .y0(this.yScale(0))
+        .y1((d) => this.yScale(d.yVal))
+        .curve(d3.curveCatmullRom.alpha(0.5))
+    },
+
+    areaPath() {
+      return this.area(this.parsedData)
     }
   },
 
@@ -212,26 +301,20 @@ export default {
     const width = 700 - margin.left - margin.right
     const height = 300 - margin.top - margin.bottom
 
-    // const createGradient = (select) => {
-    //   const gradient = select
-    //     .select('defs')
-    //     .append('linearGradient')
-    //     .attr('id', 'gradient')
-    //     .attr('x1', '0%')
-    //     .attr('y1', '100%')
-    //     .attr('x2', '0%')
-    //     .attr('y2', '0%');
+    const createGradient = (select) => {
+      const gradient = select
+        .select('defs')
+        .append('linearGradient')
+        .attr('id', 'gradient')
+        .attr('x1', '0%')
+        .attr('y1', '100%')
+        .attr('x2', '0%')
+        .attr('y2', '0%')
 
-    //   gradient
-    //     .append('stop')
-    //     .attr('offset', '0%')
-    //     .attr('style', 'stop-color:#BBF6CA;stop-opacity:0.05');
+      gradient.append('stop').attr('offset', '0%').attr('style', 'stop-color:#BBF6CA;stop-opacity:0.05')
 
-    //   gradient
-    //     .append('stop')
-    //     .attr('offset', '100%')
-    //     .attr('style', 'stop-color:#BBF6CA;stop-opacity:.5');
-    // };
+      gradient.append('stop').attr('offset', '100%').attr('style', 'stop-color:#BBF6CA;stop-opacity:.5')
+    }
 
     const createGlowFilter = (select) => {
       const filter = select.select('defs').append('filter').attr('id', 'glow')
@@ -246,7 +329,7 @@ export default {
     // const svg = null;
 
     const svg = d3
-      .select('#line-chart11')
+      .select('#line-chart')
       .append('svg')
       .attr('width', 700 + margin.left + margin.right)
       .attr('height', 300 + margin.top + margin.bottom)
@@ -254,7 +337,7 @@ export default {
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
     svg.append('defs')
-    // svg.call(createGradient);
+    svg.call(createGradient)
     svg.call(createGlowFilter)
 
     const parseTime = d3.timeParse('%Y/%m/%d')

@@ -1,19 +1,21 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
-  <div id="app">
-    <header>
-        <nav>
-          <router-link to="/">Home</router-link>
-          <router-link to="/about">About</router-link>
-          <router-link to="/some">Some</router-link>
-        </nav>
-    </header>
+  <v-app>
+    <v-app-bar app>
+      <nav>
+        <router-link to="/">Donat</router-link>
+        <router-link to="/line-with-area">LineWithArea</router-link>
+        <router-link to="/some">Some</router-link>
+      </nav>
+    </v-app-bar>
 
-    <router-view />
-  </div>
+    <v-main>
+      <v-container style="max-width: 900px">
+        <router-view />
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <style scoped>
@@ -51,5 +53,4 @@ nav a {
 nav a:first-of-type {
   border: 0;
 }
-
 </style>

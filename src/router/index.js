@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import DonatView from '@/views/DonatView.vue'
 
 Vue.use(VueRouter)
 
@@ -11,7 +11,7 @@ const router = new VueRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: DonatView
     },
     {
       path: '/about',
@@ -22,9 +22,9 @@ const router = new VueRouter({
       component: () => import('../views/AboutView.vue')
     },
     {
-      path: '/some',
-      name: 'some',
-      component: () => import('../views/SomeView.vue')
+      path: '/line-with-area',
+      name: 'line-with-area',
+      component: () => import('../views/LineWithAreaView.vue')
     }
   ]
 })
