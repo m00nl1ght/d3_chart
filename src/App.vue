@@ -6,7 +6,8 @@
       <nav>
         <router-link to="/">Donat</router-link>
         <router-link to="/line-with-area">LineWithArea</router-link>
-        <router-link to="/some">Some</router-link>
+        <router-link to="/stacked-area">StackedArea</router-link>
+        <router-link to="/stacked-bar">StackedBar</router-link>
       </nav>
     </v-app-bar>
 

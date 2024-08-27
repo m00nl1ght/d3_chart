@@ -14,17 +14,19 @@ const router = new VueRouter({
       component: DonatView
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
+      path: '/stacked-area',
+      name: 'stacked-area',
+      component: () => import('../views/StackedAreaView.vue')
     },
     {
       path: '/line-with-area',
       name: 'line-with-area',
       component: () => import('../views/LineWithAreaView.vue')
+    },
+    {
+      path: '/stacked-bar',
+      name: 'stacked-bar',
+      component: () => import('../views/StackedBarView.vue')
     }
   ]
 })

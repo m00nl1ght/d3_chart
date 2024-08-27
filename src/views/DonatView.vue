@@ -4,7 +4,7 @@
       <DonatChart :items="donatData" :valueKey="valueKey" :total="total" showDonatTooltip>
         <template #donatTooltip="{ items, selected }">
           <div>
-            <DonatTooltip :title="$t('analyticMetadata.participation.contentment')" :selected="selected" :items="items" :total="total" />
+            <AnswersChartTooltip :title="$t('analyticMetadata.participation.contentment')" :selected="selected" :items="items" :total="total" />
           </div>
         </template>
       </DonatChart>
@@ -14,13 +14,13 @@
 
 <script>
 import DonatChart from '@/views/charts/DonatChart.vue'
-import DonatTooltip from '@/views/charts/components/EmploeeWellTooltip.vue'
+import AnswersChartTooltip from '@/views/charts/components/tooltips/AnswersChartTooltip.vue'
 import { donatData } from '@/mockData.js'
 
 export default {
   components: {
     DonatChart,
-    DonatTooltip
+    AnswersChartTooltip
   },
 
   data() {

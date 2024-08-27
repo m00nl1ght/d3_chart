@@ -100,7 +100,7 @@ export default {
       type: Number,
     },
     height: {
-      default: 370,
+      default: 470,
       type: Number,
     },
   },
@@ -109,7 +109,7 @@ export default {
     return {
       marginTop: 10,
       marginRight: 10,
-      marginBottom: 20,
+      marginBottom: 60,
       marginLeft: 30,
 
       colorMapping: {

@@ -247,13 +247,25 @@ export const batChartHorizontal = [
 ]
 
 export const stackedAreaData = [
-  { count: 13, cycle: 2, involvement: 'loyal_answer' },
+  { count: 50, cycle: 2, involvement: 'loyal_answer' },
+  { count: 25, cycle: 2, involvement: 'neutral_answer' },
+  { count: 30, cycle: 2, involvement: 'negative_answer' },
+  { count: 81, cycle: 2, involvement: 'positive_answer' },
+
   { count: 22, cycle: 1, involvement: 'loyal_answer' },
-  { count: 1, cycle: 1, involvement: 'negative_answer' },
-  { count: 10, cycle: 2, involvement: 'neutral_answer' },
-  { count: 5, cycle: 1, involvement: 'neutral_answer' },
-  { count: 171, cycle: 2, involvement: 'positive_answer' },
-  { count: 182, cycle: 1, involvement: 'positive_answer' }
+  { count: 20, cycle: 1, involvement: 'neutral_answer' },
+  { count: 20, cycle: 1, involvement: 'negative_answer' },
+  { count: 120, cycle: 1, involvement: 'positive_answer' },
+
+  { count: 20, cycle: 3, involvement: 'loyal_answer' },
+  { count: 10, cycle: 3, involvement: 'neutral_answer' },
+  { count: 10, cycle: 3, involvement: 'negative_answer' },
+  { count: 50, cycle: 3, involvement: 'positive_answer' },
+
+  { count: 100, cycle: 4, involvement: 'loyal_answer' },
+  { count: 15, cycle: 4, involvement: 'neutral_answer' },
+  { count: 30, cycle: 4, involvement: 'negative_answer' },
+  { count: 20, cycle: 4, involvement: 'positive_answer' },
 ]
 
 export const donatData = [
