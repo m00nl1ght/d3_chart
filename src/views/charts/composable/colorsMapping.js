@@ -5,6 +5,7 @@ export const COLOR_MAPPING = {
   RED: '#FF764C',
   RED_DEEP: '#DE3400',
   GREY: '#F3F6F9',
+  GREY_SECONDARY: '#E9E9E9',
 
   // light colors
   GREEN_LIGHT: '#DAF5EB',

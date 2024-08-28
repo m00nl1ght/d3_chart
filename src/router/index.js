@@ -27,6 +27,12 @@ const router = new VueRouter({
       path: '/stacked-bar',
       name: 'stacked-bar',
       component: () => import('../views/StackedBarView.vue')
+    },
+
+    {
+      path: '/progress-table',
+      name: 'progress-table',
+      component: () => import('../views/ProgressTableView.vue')
     }
   ]
 })

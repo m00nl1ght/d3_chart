@@ -3,11 +3,17 @@
 <template>
   <v-app>
     <v-app-bar app>
-      <nav>
-        <router-link to="/">Donat</router-link>
-        <router-link to="/line-with-area">LineWithArea</router-link>
-        <router-link to="/stacked-area">StackedArea</router-link>
-        <router-link to="/stacked-bar">StackedBar</router-link>
+      <nav class="mt-0">
+        <div>
+          <router-link to="/">Donat</router-link>
+          <router-link to="/line-with-area">LineWithArea</router-link>
+          <router-link to="/stacked-area">StackedArea</router-link>
+          <router-link to="/stacked-bar">StackedBar</router-link>
+        </div>
+
+        <div class="mt-1">
+          <router-link to="/progress-table">ProgressTable</router-link>
+        </div>
       </nav>
     </v-app-bar>
 
