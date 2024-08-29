@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { COLOR_MAPPING } from '../charts/composable/colorsMapping'
+import { colorMapProgressTable } from '../charts/composable/colorsMapping'
 // count: 26,
 // id: 1012333,
 // title: 'Благополучие сотрудников в компании "БОБДЕЙ СОФТ". Пульс-опрос 11 🚀'
@@ -50,16 +50,16 @@ export default {
   data() {
     return {
       TODO_total: 100,
-      COLOR_MAPPING,
-      EMPTY_COLOR: COLOR_MAPPING.GREY_SECONDARY
+      colorMapProgressTable,
+      EMPTY_COLOR: colorMapProgressTable.GREY_SECONDARY
     }
   },
 
   methods: {
     getColor(value) {
-      if (value <= 20) return COLOR_MAPPING.RED
-      else if (value >= 61) return COLOR_MAPPING.GREEN
-      return COLOR_MAPPING.YELLOW
+      if (value <= 20) return colorMapProgressTable.RED
+      else if (value >= 61) return colorMapProgressTable.GREEN
+      return colorMapProgressTable.YELLOW
     }
   }
 }

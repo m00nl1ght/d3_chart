@@ -13,6 +13,7 @@
 
         <div class="mt-1">
           <router-link to="/progress-table">ProgressTable</router-link>
+          <router-link to="/tree-grid">TreeGrid</router-link>
         </div>
       </nav>
     </v-app-bar>

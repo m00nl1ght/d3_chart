@@ -33,6 +33,11 @@ const router = new VueRouter({
       path: '/progress-table',
       name: 'progress-table',
       component: () => import('../views/ProgressTableView.vue')
+    },
+    {
+      path: '/tree-grid',
+      name: 'tree-grid',
+      component: () => import('../views/TreeGridView.vue')
     }
   ]
 })

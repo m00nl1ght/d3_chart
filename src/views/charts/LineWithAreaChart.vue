@@ -3,8 +3,8 @@
     <svg :width="width" :height="height" :viewBox="viewBox" class="chart">
       <g v-if="parsedData && parsedData.length !== 0">
         <g fill="none">
-          <path opacity="0.2" :d="areaPath" :fill="COLOR_MAPPING.GREEN"></path>
-          <path :d="line(parsedData)" style="fill: none" :stroke="COLOR_MAPPING.GREEN" :stroke-width="LINE_STROKE_WIDTH"></path>
+          <path opacity="0.2" :d="areaPath" :fill="colorMapLineWithArea.GREEN"></path>
+          <path :d="line(parsedData)" style="fill: none" :stroke="colorMapLineWithArea.GREEN" :stroke-width="LINE_STROKE_WIDTH"></path>
         </g>
 
         <g @mouseover="(evt) => onMouseenter(evt)" @mouseleave="onMouseleave">
@@ -14,7 +14,7 @@
             :r="CIRCLE_RADIUS"
             :cy="yScale(item.yVal)"
             :cx="xScale(item.xVal)"
-            :style="`fill: ${COLOR_MAPPING.GREEN}`"
+            :style="`fill: ${colorMapLineWithArea.GREEN}`"
             :aria-label="`${item.xVal};${item.yVal}`"
           ></circle>
         </g>
@@ -49,7 +49,7 @@
 /* eslint-disable */
 import * as d3 from 'd3'
 // import { getFormattedDate } from '@/helpers/utils'
-import { COLOR_MAPPING } from './composable/colorsMapping'
+import { colorMapLineWithArea } from './composable/colorsMapping'
 import BarCharHover from './components/ChartTooltipBox.vue'
 import LineWithAreaChartTooltip from './components/tooltips/LineWithAreaChartTooltip.vue'
 import EmptyBee from './components/EmptyBee.vue'
@@ -113,7 +113,7 @@ export default {
 
   data() {
     return {
-      COLOR_MAPPING,
+      colorMapLineWithArea,
       LINE_STROKE_WIDTH: 4,
       CIRCLE_RADIUS: '7px',
 
