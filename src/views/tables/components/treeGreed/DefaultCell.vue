@@ -1,8 +1,5 @@
 <template>
-  <span
-    :class="`zk-table--level-${row._level}-cell`"
-    :style="{ marginLeft: `${(row._level - 1) * 24}px`, paddingLeft: row._childrenLen === 0 ? '20px' : '' }"
-  >
+  <span>
     {{ row[column.prop] ? row[column.prop] : '' }}
   </span>
 </template>

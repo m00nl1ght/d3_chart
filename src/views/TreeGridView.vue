@@ -90,7 +90,7 @@ export default {
           ]
         },
         {
-          name: 'Tom',
+          name: 'Tom1',
           sex: 'male',
           likes: ['football', 'basketball'],
           score: 20,
@@ -138,13 +138,13 @@ export default {
           ]
         },
         {
-          name: 'Tom',
+          name: 'Tom2',
           sex: 'male',
           likes: ['football', 'basketball'],
           score: 20
         },
         {
-          name: 'Tom',
+          name: 'Tom3',
           sex: 'male',
           likes: ['football', 'basketball'],
           score: 20,

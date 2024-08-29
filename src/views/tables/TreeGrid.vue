@@ -1,19 +1,23 @@
 <template>
   <div>
+    <TreeGridHeader :tableColumns="columns" />
     <TreeGridBody :bodyData="bodyData" :tableColumns="columns" />
   </div>
 </template>
 
 <script>
+import TreeGridHeader from './components/treeGreed/TreeGridHeader.vue'
 import TreeGridBody from './components/treeGreed/TreeGridBody.vue'
 
 function getBodyData(data, isTreeType, childrenProp, isFold, level = 1) {
   let bodyData = []
+
   data.forEach((row, index) => {
     const children = row[childrenProp]
-    console.log('children', children)
-
     const childrenLen = children && children.length ? children.length : 0
+    console.log('row', row.name)
+    console.log('childrenLen', childrenLen)
+
     bodyData.push({
       _isHover: false,
       _isExpanded: false,
@@ -31,6 +35,7 @@ function getBodyData(data, isTreeType, childrenProp, isFold, level = 1) {
       }
     }
   })
+
   return bodyData
 }
 
@@ -57,7 +62,7 @@ export default {
       default: 'children'
     },
     treeType: {
-      // складывается
+      // режим дерева
       type: Boolean,
       default: true
     },
@@ -69,6 +74,7 @@ export default {
   },
 
   components: {
+    TreeGridHeader,
     TreeGridBody
   },
 
@@ -91,4 +97,6 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss">
+@import './treeGrid.scss';
+</style>

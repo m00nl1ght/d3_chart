@@ -1,5 +1,5 @@
 <template>
-  <table cellspacing="0" cellpadding="0" border="0">
+  <table cellspacing="0" cellpadding="0" border="0" :class="`${this.prefixCls}__body`">
     <colgroup>
       <col v-for="(column, idx) in tableColumns" :key="`col_${idx}`" :width="column.computedWidth || column.minWidth || column.width" />
     </colgroup>
@@ -9,6 +9,8 @@
         v-for="(row, rowIndex) in bodyData"
         v-show="!row._isHide"
         :key="rowIndex"
+        :style="getStyle('row', row, rowIndex)"
+        :class="getClassName('row', row, rowIndex)"
         @on-click="($event) => this.handleEvent($event, 'row', { row, rowIndex })"
         @on-dblclick="($event) => this.handleEvent($event, 'row', { row, rowIndex })"
         @on-contextmenu="($event) => this.handleEvent($event, 'row', { row, rowIndex })"
@@ -17,6 +19,8 @@
       >
         <td
           v-for="(column, columnIndex) in tableColumns"
+          :style="getStyle('cell', row, rowIndex, column, columnIndex)"
+          :class="getClassName('cell', row, rowIndex, column, columnIndex)"
           @on-click="($event) => this.handleEvent($event, 'cell', { row, rowIndex, column, columnIndex })"
           @on-dblclick="($event) => this.handleEvent($event, 'cell', { row, rowIndex, column, columnIndex })"
           @on-contextmenu="($event) => this.handleEvent($event, 'cell', { row, rowIndex, column, columnIndex })"
@@ -45,14 +49,11 @@
 import FirstPropCell from './FirstPropCell.vue'
 import DefaultCell from './DefaultCell.vue'
 
-// :style="getStyle('row', row, rowIndex)"
-// :class="getClassName('row', row, rowIndex)"
+import mixins from '../../utils/treeGridMixin.js'
 
-//   :style="getStyle('cell', row, rowIndex, column, columnIndex)"
-//   :class="getClassName('cell', row, rowIndex, column, columnIndex)"
-
-// :class="getClassName('inner', row, rowIndex, column, columnIndex)"
 export default {
+  mixins: [mixins],
+
   props: {
     bodyData: {
       type: Array,
@@ -73,6 +74,10 @@ export default {
   computed: {
     firstProp() {
       return this.tableColumns[0].prop
+    },
+
+    table() {
+      return this.$parent
     }
   },
 
@@ -80,17 +85,34 @@ export default {
     // isExpandCell(table, columnIndex) {
     //   return table.expandType && ((table.showIndex && columnIndex === 1) || (!table.showIndex && columnIndex === 0))
     // },
+    toggleStatus(type, row, rowIndex, value) {
+      this.validateType(type, ['Expanded', 'Checked', 'Hide', 'Fold'], 'toggleStatus', false)
+      const target = this.bodyData[rowIndex]
+      this.bodyData.splice(rowIndex, 1, {
+        ...target,
+        [`_is${type}`]: typeof value === 'undefined' ? !row[`_is${type}`] : value
+      })
+    },
 
-    validateType(type, validTypes, funcName, isReturn = true) {
-      if (validTypes.indexOf(type) < 0) throw new Error(`${funcName}'s type must is ${validTypes.join(' or ')}.`)
-      if (isReturn) {
-        const certainType = {}
-        validTypes.forEach((item) => {
-          certainType[item] = item === type
-        })
-        return certainType
+    getChildrenIndex(parentLevel, parentIndex, careFold = true) {
+      const data = this.bodyData
+      let childrenIndex = []
+      for (let i = parentIndex + 1; i < data.length; i++) {
+        if (data[i]._level <= parentLevel) break
+        if (data[i]._level - 1 === parentLevel) {
+          childrenIndex.push(i)
+        }
       }
-      return true
+      const len = childrenIndex.length // important!!!
+      if (len > 0) {
+        for (let i = 0; i < len; i++) {
+          const childData = data[childrenIndex[i]]
+          if (childData._childrenLen && (!careFold || (careFold && !childData._isFold))) {
+            childrenIndex = childrenIndex.concat(this.getChildrenIndex(childData._level, childrenIndex[i], careFold))
+          }
+        }
+      }
+      return childrenIndex
     },
 
     handleEvent($event, type, data, others) {
@@ -123,10 +145,12 @@ export default {
         $event.stopPropagation()
         this.toggleStatus('Fold', row, rowIndex)
         const childrenIndex = this.getChildrenIndex(row._level, rowIndex)
+        console.log('childrenIndex', childrenIndex)
+
         for (let i = 0; i < childrenIndex.length; i++) {
           this.toggleStatus('Hide', latestData[childrenIndex[i]], childrenIndex[i])
         }
-        return this.table.$emit('tree-icon-click', latestData[rowIndex], column, columnIndex, $event)
+        return this.$emit('tree-icon-click', latestData[rowIndex], column, columnIndex, $event)
       }
 
       if (certainType.cell && eventType === 'click') {
@@ -226,69 +250,69 @@ export default {
       //   : '';
       // }
       // return '';
+    },
+
+    getStyle(type, row, rowIndex, column, columnIndex) {
+      const certainType = this.validateType(type, ['cell', 'row'], 'getStyle')
+      const style = this.table[`${type}Style`]
+      if (typeof style === 'function') {
+        if (certainType.row) {
+          return style.call(null, row, rowIndex)
+        }
+        if (certainType.cell) {
+          return style.call(null, row, rowIndex, column, columnIndex)
+        }
+      }
+      return style
+    },
+
+    // className
+    getClassName(type, row, rowIndex, column, columnIndex) {
+      const certainType = this.validateType(type, ['cell', 'row', 'inner'], 'getClassName')
+      const classList = []
+      if (certainType.row || certainType.cell) {
+        const className = this.table[`${type}ClassName`]
+        if (typeof className === 'string') {
+          classList.push(className)
+        } else if (typeof className === 'function') {
+          if (certainType.row) {
+            classList.push(className.call(null, row, rowIndex) || '')
+          }
+          if (certainType.cell) {
+            classList.push(className.call(null, row, rowIndex, column, columnIndex) || '')
+          }
+        }
+        if (certainType.row) {
+          classList.push(`${this.prefixCls}__body-row`)
+          if (this.table.stripe && rowIndex % 2 !== 0) {
+            classList.push(`${this.prefixCls}--stripe-row`)
+          }
+          if (this.table.showRowHover && row._isHover) {
+            classList.push(`${this.prefixCls}--row-hover`)
+          }
+        }
+        if (certainType.cell) {
+          classList.push(`${this.prefixCls}__body-cell`)
+          if (this.table.border) {
+            classList.push(`${this.prefixCls}--border-cell`)
+          }
+          const align = column.align
+          if (['center', 'right'].indexOf(align) > -1) {
+            classList.push(`${this.prefixCls}--${align}-cell`)
+          }
+        }
+      }
+      if (certainType.inner) {
+        classList.push(`${this.prefixCls}__cell-inner`)
+        if (this.isExpandCell(this.table, columnIndex)) {
+          classList.push(`${this.prefixCls}--expand-inner`)
+          if (row._isExpanded) {
+            classList.push(`${this.prefixCls}--expanded-inner`)
+          }
+        }
+      }
+      return classList.join(' ')
     }
-
-    // getStyle(type, row, rowIndex, column, columnIndex) {
-    //   const certainType = this.validateType(type, ['cell', 'row'], 'getStyle')
-    //   const style = this.table[`${type}Style`]
-    //   if (typeof style === 'function') {
-    //     if (certainType.row) {
-    //       return style.call(null, row, rowIndex)
-    //     }
-    //     if (certainType.cell) {
-    //       return style.call(null, row, rowIndex, column, columnIndex)
-    //     }
-    //   }
-    //   return style
-    // },
-
-    // // className
-    // getClassName(type, row, rowIndex, column, columnIndex) {
-    //   const certainType = this.validateType(type, ['cell', 'row', 'inner'], 'getClassName')
-    //   const classList = []
-    //   if (certainType.row || certainType.cell) {
-    //     const className = this.table[`${type}ClassName`]
-    //     if (typeof className === 'string') {
-    //       classList.push(className)
-    //     } else if (typeof className === 'function') {
-    //       if (certainType.row) {
-    //         classList.push(className.call(null, row, rowIndex) || '')
-    //       }
-    //       if (certainType.cell) {
-    //         classList.push(className.call(null, row, rowIndex, column, columnIndex) || '')
-    //       }
-    //     }
-    //     if (certainType.row) {
-    //       classList.push(`${this.prefixCls}__body-row`)
-    //       if (this.table.stripe && rowIndex % 2 !== 0) {
-    //         classList.push(`${this.prefixCls}--stripe-row`)
-    //       }
-    //       if (this.table.showRowHover && row._isHover) {
-    //         classList.push(`${this.prefixCls}--row-hover`)
-    //       }
-    //     }
-    //     if (certainType.cell) {
-    //       classList.push(`${this.prefixCls}__body-cell`)
-    //       if (this.table.border) {
-    //         classList.push(`${this.prefixCls}--border-cell`)
-    //       }
-    //       const align = column.align
-    //       if (['center', 'right'].indexOf(align) > -1) {
-    //         classList.push(`${this.prefixCls}--${align}-cell`)
-    //       }
-    //     }
-    //   }
-    //   if (certainType.inner) {
-    //     classList.push(`${this.prefixCls}__cell-inner`)
-    //     if (this.isExpandCell(this.table, columnIndex)) {
-    //       classList.push(`${this.prefixCls}--expand-inner`)
-    //       if (row._isExpanded) {
-    //         classList.push(`${this.prefixCls}--expanded-inner`)
-    //       }
-    //     }
-    //   }
-    //   return classList.join(' ')
-    // }
   }
 }
 </script>
