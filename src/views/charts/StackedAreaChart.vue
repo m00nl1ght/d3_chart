@@ -15,11 +15,11 @@
       <svg :width="width" :height="height" :viewBox="viewBox" class="chart">
         <g>
           <text class="x-legend">
-            <tspan>TODO_количество</tspan>
+            <tspan>TODO_rename_количество</tspan>
           </text>
 
           <text class="y-legend">
-            <tspan>TODO_цикл</tspan>
+            <tspan>TODO_rename_цикл</tspan>
           </text>
         </g>
 
@@ -293,7 +293,9 @@ export default {
 
     getTooltipValue(item) {
       return {
-        title: this.$t(`analyticMetadata.chartsData.${item[this.valueKey]}`),
+        title: this.$te(`analyticMetadata.chartsData.${item[this.valueKey]}`)
+          ? this.$t(`analyticMetadata.chartsData.${item[this.valueKey]}`)
+          : item[this.valueKey],
         value: item[this.countKey],
         color: this.getColorLine(item[this.valueKey]),
         raw: item

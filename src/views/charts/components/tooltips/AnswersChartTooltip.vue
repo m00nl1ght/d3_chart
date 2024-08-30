@@ -48,13 +48,20 @@
 </template>
 
 <script>
+// interface IItem {
+//   color: string
+//   title: string
+//   value: string | number
+// }
 export default {
   props: {
     items: {
+      // type: IItem[]
       type: Array,
       default: () => []
     },
     selected: {
+      // type: IItem
       type: Object,
       default: () => ({})
     },
@@ -65,12 +72,6 @@ export default {
     total: {
       type: Number,
       default: 0
-    }
-  },
-
-  data() {
-    return {
-      // colorMapDonat,
     }
   },
 
