@@ -1,21 +1,25 @@
 <template>
-  <span
+  <div
+    class="d-flex align-center"
     :class="`${this.prefixCls}--level-${row._level}-cell`"
     :style="{ marginLeft: `${(row._level - 1) * 24}px`, paddingLeft: row._childrenLen === 0 ? '20px' : '' }"
   >
-    <v-icon
+    <div
       v-if="row._childrenLen > 0"
-      small
       @click="($event) => $emit('handleEvent', $event, 'icon', { row, rowIndex, column, columnIndex }, { isFold: row._isFold })"
-      >{{ row._isFold ? 'mdi-plus' : 'mdi-minus' }}</v-icon
+      class="icon-box"
     >
-    <!-- <i v-if="row._childrenLen > 0" :class="`zk-table--tree-icon zk-icon zk-icon-${row._isFold ? 'plus' : 'minus'}-square-o`"></i> -->
+      <component :is="row._isFold ? 'ArrowRight' : 'ArrowDown'"></component>
+    </div>
     {{ row[column.prop] ? row[column.prop] : '' }}
-  </span>
+  </div>
 </template>
 
 <script>
 import mixins from '../../utils/treeGridMixin.js'
+
+import ArrowDown from '../icons/ArrowDown.vue'
+import ArrowRight from '../icons/ArrowRight.vue'
 
 export default {
   mixins: [mixins],
@@ -32,8 +36,19 @@ export default {
       default: () => ({})
     },
     columnIndex: Number
+  },
+
+  components: {
+    ArrowDown,
+    ArrowRight
   }
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.icon-box {
+  height: 16px;
+  margin-right: 12px;
+  cursor: pointer;
+}
+</style>

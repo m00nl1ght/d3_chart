@@ -6,6 +6,7 @@
 </template>
 
 <script>
+// https://github.com/MisterTaki/vue-table-with-tree-grid
 import TreeGridHeader from './components/treeGreed/TreeGridHeader.vue'
 import TreeGridBody from './components/treeGreed/TreeGridBody.vue'
 
@@ -15,8 +16,6 @@ function getBodyData(data, isTreeType, childrenProp, isFold, level = 1) {
   data.forEach((row, index) => {
     const children = row[childrenProp]
     const childrenLen = children && children.length ? children.length : 0
-    console.log('row', row.name)
-    console.log('childrenLen', childrenLen)
 
     bodyData.push({
       _isHover: false,

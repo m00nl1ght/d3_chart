@@ -64,7 +64,6 @@ export default {
       return classList.join(' ')
     },
 
-    // 根据type渲染单元格Label
     renderLabel(column, columnIndex) {
       // if (this.isSelectionCell(this.table, columnIndex)) {
       //   const allCheck = this.table.bodyData.every((row) => row._isChecked)

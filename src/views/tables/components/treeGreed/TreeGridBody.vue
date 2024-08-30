@@ -82,12 +82,12 @@ export default {
   },
 
   methods: {
-    // isExpandCell(table, columnIndex) {
-    //   return table.expandType && ((table.showIndex && columnIndex === 1) || (!table.showIndex && columnIndex === 0))
-    // },
     toggleStatus(type, row, rowIndex, value) {
       this.validateType(type, ['Expanded', 'Checked', 'Hide', 'Fold'], 'toggleStatus', false)
       const target = this.bodyData[rowIndex]
+
+      // TODO do replace emit change
+      // remove mutation parent
       this.bodyData.splice(rowIndex, 1, {
         ...target,
         [`_is${type}`]: typeof value === 'undefined' ? !row[`_is${type}`] : value
@@ -116,14 +116,10 @@ export default {
     },
 
     handleEvent($event, type, data, others) {
-      console.log('where')
-
       const certainType = this.validateType(type, ['cell', 'row', 'checkbox', 'icon'], 'handleEvent')
       const eventType = $event ? $event.type : ''
       const { row, rowIndex, column, columnIndex } = data
       const latestData = this.bodyData
-
-      console.log('where2')
 
       // Checkbox
       if (certainType.checkbox) {
@@ -140,12 +136,9 @@ export default {
 
       // Tree's icon
       if (certainType.icon) {
-        console.log('certainType.icon')
-
         $event.stopPropagation()
         this.toggleStatus('Fold', row, rowIndex)
         const childrenIndex = this.getChildrenIndex(row._level, rowIndex)
-        console.log('childrenIndex', childrenIndex)
 
         for (let i = 0; i < childrenIndex.length; i++) {
           this.toggleStatus('Hide', latestData[childrenIndex[i]], childrenIndex[i])
@@ -179,10 +172,6 @@ export default {
     },
 
     renderCell(row, rowIndex, column, columnIndex) {
-      // return 'FirstPropCell'
-      // console.log('column.prop', column.prop)
-      // console.log('this.firstProp', this.firstProp)
-
       if (this.firstProp === column.prop) return 'FirstPropCell'
       return 'DefaultCell'
 
