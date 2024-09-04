@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <StackedAreaChart :items="items" valueKey="involvement" />
+      <StackedAreaChart :items="stackedAreaData" yValueKey="involvement" />
     </v-col>
   </v-row>
 </template>

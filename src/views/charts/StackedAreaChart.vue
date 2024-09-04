@@ -72,7 +72,6 @@
 </template>
 
 <script>
-/* eslint-disable */
 import * as d3 from 'd3'
 import { colorMapStackedArea, colorMapStackedAreaLine } from './composable/colorsMapping'
 
@@ -105,7 +104,6 @@ export default {
 
   props: {
     items: {
-      // TODO sort by cycle
       type: Array,
       default: () => []
     },
@@ -117,13 +115,17 @@ export default {
       default: 270,
       type: Number
     },
-    valueKey: {
+    yValueKey: {
       type: String,
       default: 'value'
     },
-    countKey: {
+    yCountKey: {
       type: String,
       default: 'count'
+    },
+    xValueKey: {
+      type: String,
+      default: 'cycle'
     }
   },
 
@@ -149,13 +151,16 @@ export default {
   },
 
   computed: {
+    sortedItems() {
+      return this.items.sort((a, b) => a[this.xValueKey] - b[this.xValueKey])
+    },
+
     viewBox() {
-      // return [-this.width / 2, -this.height / 2, this.width, this.height];
       return `0 0 ${this.width} ${this.height}`
     },
 
     xDomain() {
-      const domain = d3.extent(this.items, (d) => d.cycle)
+      const domain = d3.extent(this.sortedItems, (d) => d[this.xValueKey])
       return [domain[0], domain[1]]
     },
 
@@ -175,25 +180,25 @@ export default {
     },
 
     series() {
-      // if(!this.items) return []
+      // if(!this.sortedItems) return []
       return d3
         .stack()
         .offset(d3.stackOffsetExpand)
         .keys(
           d3.union(
-            this.items.map((d) => {
-              return d[this.valueKey]
+            this.sortedItems.map((d) => {
+              return d[this.yValueKey]
             })
           )
         ) // distinct series keys, in input order
         .value(([, D], key) => {
-          return D.get(key) ? D.get(key)[this.countKey] : 0
+          return D.get(key) ? D.get(key)[this.yCountKey] : 0
         })(
         // get value for each series key and stack
         d3.index(
-          this.items,
-          (d) => d.cycle,
-          (d) => d[this.valueKey]
+          this.sortedItems,
+          (d) => d[this.xValueKey],
+          (d) => d[this.yValueKey]
         )
       ) // group by stack then series key
     },
@@ -248,13 +253,15 @@ export default {
 
     tooltipItems() {
       if (this.focusedElem && this.focusedElem[0])
-        return this.items.filter((item) => item.cycle === Number(this.focusedElem[0])).map((_) => this.getTooltipValue(_))
+        return this.sortedItems.filter((item) => item[this.xValueKey] === Number(this.focusedElem[0])).map((_) => this.getTooltipValue(_))
       return []
     },
 
     tooltipSelected() {
       if (this.focusedElem && this.focusedElem[0] && this.focusedElem[1]) {
-        const selected = this.items.find((item) => item.cycle === Number(this.focusedElem[0]) && item[this.valueKey] === this.focusedElem[1])
+        const selected = this.sortedItems.find(
+          (item) => item[this.xValueKey] === Number(this.focusedElem[0]) && item[this.yValueKey] === this.focusedElem[1]
+        )
         if (selected) return this.getTooltipValue(selected)
       }
       return undefined
@@ -293,11 +300,11 @@ export default {
 
     getTooltipValue(item) {
       return {
-        title: this.$te(`analyticMetadata.chartsData.${item[this.valueKey]}`)
-          ? this.$t(`analyticMetadata.chartsData.${item[this.valueKey]}`)
-          : item[this.valueKey],
-        value: item[this.countKey],
-        color: this.getColorLine(item[this.valueKey]),
+        title: this.$te(`analyticMetadata.chartsData.${item[this.yValueKey]}`)
+          ? this.$t(`analyticMetadata.chartsData.${item[this.yValueKey]}`)
+          : item[this.yValueKey],
+        value: item[this.yCountKey],
+        color: this.getColorLine(item[this.yValueKey]),
         raw: item
       }
     }

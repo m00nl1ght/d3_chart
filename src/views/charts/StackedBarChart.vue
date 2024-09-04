@@ -57,7 +57,6 @@
 </template>
 
 <script>
-/* eslint-disable */
 import * as d3 from 'd3'
 import { colorMapStackedBar } from './composable/colorsMapping'
 
@@ -328,6 +327,7 @@ export default {
 
 <style lang="scss" scoped>
 svg {
+  pointer-events: auto;
   stroke-width: 1;
 }
 

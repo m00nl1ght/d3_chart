@@ -28,6 +28,11 @@ const router = new VueRouter({
       name: 'stacked-bar',
       component: () => import('../views/StackedBarView.vue')
     },
+    {
+      path: '/line-dot',
+      name: 'line-dot',
+      component: () => import('../views/LineDotView.vue')
+    },
 
     {
       path: '/progress-table',

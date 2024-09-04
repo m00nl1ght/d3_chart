@@ -9,6 +9,7 @@
           <router-link to="/line-with-area">LineWithArea</router-link>
           <router-link to="/stacked-area">StackedArea</router-link>
           <router-link to="/stacked-bar">StackedBar</router-link>
+          <router-link to="/line-dot">LineDotView</router-link>
         </div>
 
         <div class="mt-1">

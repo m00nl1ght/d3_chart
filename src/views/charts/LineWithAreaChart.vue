@@ -46,7 +46,6 @@
 </template>
 
 <script>
-/* eslint-disable */
 import * as d3 from 'd3'
 // import { getFormattedDate } from '@/helpers/utils'
 import { colorMapLineWithArea } from './composable/colorsMapping'
@@ -218,7 +217,12 @@ export default {
 
 <style lang="scss" scoped>
 svg {
+  pointer-events: auto;
   stroke-width: 1;
+}
+
+.chart::v-deep circle {
+  cursor: pointer;
 }
 
 .letters {

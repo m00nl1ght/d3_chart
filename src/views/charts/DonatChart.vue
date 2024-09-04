@@ -74,7 +74,6 @@
 </template>
 
 <script>
-/* eslint-disable */
 // пример анимации
 // https://codepen.io/thibautg/pen/dJVNwm
 import BarCharHover from './components/ChartTooltipBox.vue'
